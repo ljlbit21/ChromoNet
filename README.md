@@ -98,10 +98,4 @@ If you use ChromoNet in your research, please cite:
 
 ```
 
-```
 
-
-
-这份 README 能够让审稿人和同行一眼看出你工作的**科学深度**和**临床价值**。准备好建立仓库了吗？
-
-```
