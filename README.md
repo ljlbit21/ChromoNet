@@ -1,6 +1,6 @@
 
 
-### 📄 ChromoNet (SCANER-DL) README 模板
+### 📄 ChromoNet  README 
 
 ```markdown
 # ChromoNet: A Genomic Structure-Aware 1D-CNN for Robust Malignant Cell Identification
