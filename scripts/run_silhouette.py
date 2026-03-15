@@ -16,15 +16,14 @@ sc.settings.verbosity = 0
 warnings.filterwarnings("ignore")
 os.environ["PYTHONWARNINGS"] = "ignore"
 
-# 添加 src 路径
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from src.model import ChromoNet
-from src.preprocessor import SmartPreprocessor
+# ==================== 路径自动适配（关键修复）====================
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(BASE_DIR)
 
-# === 配置 ===
-INPUT_CSV = "../data/processed/BRCA_1.csv"
-MODEL_PATH = "../results/models/best_brca_model.pth"
-GENE_POS_PATH = "../data/reference/gene_pos_hg19.csv"
+# === 配置（现在使用绝对路径，无论从哪里运行都正确）===
+INPUT_CSV = os.path.join(BASE_DIR, "data", "processed", "BRCA_1.csv")
+MODEL_PATH = os.path.join(BASE_DIR, "results", "models", "best_brca_model.pth")
+GENE_POS_PATH = os.path.join(BASE_DIR, "data", "reference", "gene_pos_hg19.csv")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def run_clustering_and_score(X_data, tag="Method"):
@@ -38,7 +37,6 @@ def run_clustering_and_score(X_data, tag="Method"):
     adata = sc.AnnData(X=X_data)
     
     # 计算邻居图 (关键: use_rep='X' 防止自动PCA)
-    # n_jobs=1 防止 Windows 下多进程导致的闪屏
     try:
         sc.pp.neighbors(adata, use_rep='X', n_neighbors=15, metric='cosine', n_jobs=1)
     except:
@@ -47,19 +45,16 @@ def run_clustering_and_score(X_data, tag="Method"):
     print(f"   🔍 {tag}: 正在搜索最佳分辨率 (0.1 - 0.6)...")
     
     # 尝试不同的分辨率
-    # 使用 tqdm 可能会导致闪屏，这里直接用普通循环
     for res in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]:
         try:
-            # 使用默认 flavor，不强求 igraph，兼容性更好
             sc.tl.leiden(adata, resolution=res, key_added=f'leiden_{res}')
             
             labels = adata.obs[f'leiden_{res}'].values
             unique_labels = np.unique(labels)
             n_clusters = len(unique_labels)
             
-            # 有效聚类必须 > 1 类，且不能太碎 (例如 > 15 个类可能是噪声)
+            # 有效聚类必须 > 1 类，且不能太碎
             if 1 < n_clusters < 15:
-                # 采样计算 silhouette 以防内存溢出 (虽然这里数据量不大)
                 if len(X_data) > 10000:
                     idx = np.random.choice(len(X_data), 10000, replace=False)
                     score = silhouette_score(X_data[idx], labels[idx], metric='cosine')
@@ -102,14 +97,13 @@ def main():
 
     # 2. 预处理
     preprocessor = SmartPreprocessor(GENE_POS_PATH)
-    # 这里的 print 可能会导致一点点输出，但 preprocessor 里没法控制，忍一下
     X_res, _, gene_order = preprocessor.process(df_tumor, 'New_Cell_Type')
     
     # 3. 方法 A: Baseline (Raw -> PCA)
     print("\n🔹 计算 Baseline (Raw + PCA)...")
     pca = PCA(n_components=50)
     X_pca = pca.fit_transform(X_res)
-    X_pca = StandardScaler().fit_transform(X_pca) # 标准化
+    X_pca = StandardScaler().fit_transform(X_pca)
     
     score_baseline = run_clustering_and_score(X_pca, tag="Baseline")
 
@@ -127,7 +121,7 @@ def main():
     with torch.no_grad():
         deep_features = model.extract_features(X_tensor).cpu().numpy()
     
-    deep_features = StandardScaler().fit_transform(deep_features) # 标准化
+    deep_features = StandardScaler().fit_transform(deep_features)
     
     score_chromonet = run_clustering_and_score(deep_features, tag="ChromoNet")
 
