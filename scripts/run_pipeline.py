@@ -6,20 +6,27 @@ import sys
 import argparse
 from sklearn.model_selection import train_test_split
 
-# 路径适配
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# ==================== 路径自动适配（关键修复）====================
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(BASE_DIR)
+
+# 默认路径全部使用绝对路径
+DEFAULT_INPUT = os.path.join(BASE_DIR, "data", "processed", "NSCLC.csv")
+DEFAULT_OUTPUT = os.path.join(BASE_DIR, "results", "nsclc_standard")
+DEFAULT_MODEL_SAVE = os.path.join(BASE_DIR, "results", "models", "best_NSCLC_model.pth")
+GENE_POS_PATH = os.path.join(BASE_DIR, "data", "reference", "gene_pos_hg19.csv")
+
 from src.preprocessor import SmartPreprocessor
 from src.model import ChromoNet
 from src.trainer import train_model
 from src import visualizer as viz 
 
 def main():
-    # 1. 命令行参数
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=str, default="../data/processed/NSCLC.csv", help="输入数据路径")
-    parser.add_argument("--ref", type=str, default="../data/processed/NSCLC.csv", help="参考答案路径")
-    parser.add_argument("--output", type=str, default="../results/nsclc_standard", help="输出目录")
-    parser.add_argument("--model_save", type=str, default="../results/models/best_NSCLC_model.pth", help="模型保存路径")
+    parser.add_argument("--input", type=str, default=DEFAULT_INPUT)
+    parser.add_argument("--output", type=str, default=DEFAULT_OUTPUT)
+    parser.add_argument("--model_save", type=str, default=DEFAULT_MODEL_SAVE)
+    # --ref 参数已移除（原代码从未使用）
     args = parser.parse_args()
 
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -33,22 +40,19 @@ def main():
     df = pd.read_csv(args.input)
     if 'Cell_ID' not in df.columns: df['Cell_ID'] = df.index.astype(str)
     
-    # 标签处理 (忽略 Label 3)
     LABEL_COL = 'New_Cell_Type'
     if LABEL_COL in df.columns:
         df = df[df[LABEL_COL] != 3].copy()
         
-    # 3. 预处理
-    gene_pos_path = "../data/reference/gene_pos_hg19.csv"
-    preprocessor = SmartPreprocessor(gene_pos_path)
+    # 3. 预处理（使用绝对路径）
+    preprocessor = SmartPreprocessor(GENE_POS_PATH)
     mode = preprocessor.analyze_dataset(df, LABEL_COL)
     X_res, y, gene_order = preprocessor.process(df, LABEL_COL)
     if gene_order is None or len(gene_order) == 0:
-        print("❌ 基因顺序为空，无法构建模型。请检查输入数据与参考基因位置文件。")
+        print("❌ 基因顺序为空...")
         return
     
-    # [新增] 加载位置文件，用于画图坐标轴
-    pos_df = pd.read_csv(gene_pos_path, index_col=0)
+    pos_df = pd.read_csv(GENE_POS_PATH, index_col=0)
     
     X_tensor = torch.FloatTensor(X_res).to(DEVICE)
     y_tensor = torch.LongTensor(y).to(DEVICE)
