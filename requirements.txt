@@ -1,1 +1,12 @@
-
+torch==2.4.1
+torchvision==0.19.1
+torchaudio==2.4.1
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.5.1
+scanpy==1.10.2
+seaborn==0.13.2
+matplotlib==3.9.2
+scipy==1.14.1
+tqdm==4.66.5
+openpyxl==3.1.5   # 如果需要读 Excel
