@@ -9,18 +9,17 @@ from sklearn.metrics import silhouette_score
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-# === 1. 全局静默设置 (解决终端刷新问题) ===
+# === 1. 全局静默设置 ===
 # 关闭 Scanpy 的进度条和提示
 sc.settings.verbosity = 0 
-# 忽略烦人的警告
 warnings.filterwarnings("ignore")
 os.environ["PYTHONWARNINGS"] = "ignore"
 
-# ==================== 路径自动适配（关键修复）====================
+# ==================== 路径自动适配====================
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(BASE_DIR)
 
-# === 配置（现在使用绝对路径，无论从哪里运行都正确）===
+# === 配置（现在使用绝对路径）===
 INPUT_CSV = os.path.join(BASE_DIR, "data", "processed", "BRCA_1.csv")
 MODEL_PATH = os.path.join(BASE_DIR, "results", "models", "best_brca_model.pth")
 GENE_POS_PATH = os.path.join(BASE_DIR, "data", "reference", "gene_pos_hg19.csv")
