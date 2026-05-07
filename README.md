@@ -80,7 +80,7 @@ ChromoNet/
 ## 📖 如何引用
 ```bibtex
 @software{chromonet_v1.0.0,
-  author = {李佳黎 et al.},
+  author = {Li Jiali et al.},
   title  = {ChromoNet: A Genomic Structure-Aware Framework for Malignant Cell Detection},
   year   = {2026},
   publisher = {Zenodo},
