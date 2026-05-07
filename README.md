@@ -1,4 +1,4 @@
- ##ChromoNet: 基于基因组结构感知的单细胞恶性细胞识别框架
+## ChromoNet: 基于基因组结构感知的单细胞恶性细胞识别框架
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12345678.svg)](https://doi.org/10.5281/zenodo.12345678)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -7,14 +7,14 @@
 ChromoNet v1.0.0 
 通过将基因表达矩阵重构为**物理有序的基因组信号**，结合 1D-CNN + 自适应内部基准，实现高鲁棒性的恶性细胞识别（即使 50% Dropout 仍保持 >85% 准确率）。
 
- 🌟 核心亮点
+ ## 🌟 核心亮点
 
 - 基因组结构感知 (Genomic Structure-Aware)：将杂乱的基因表达矩阵重构为具有空间连续性的“基因组波形信号”，利用 1D-CNN 提取染色体臂级和局部 CNV 特征 。
 - 自适应内源基准 (Adaptive Internal Reference)：提出 Endogenous Benchmark 策略，通过识别组织内部正常细胞消除批次效应，无需外部 WES 或 SNP 参考，大幅提升临床样本适用性 。
 - 机制级可解释性 (CDS Framework)：引入全新的因果信号发现 (Causal-Signal Discovery, CDS) 验证框架，通过模拟染色体剂量变化验证预测逻辑，实现从“统计拟合”到“生物逻辑”的飞跃 。
 - 高鲁棒性预训练 (MAE-enhanced)：结合掩码自编码器 (MAE) 自监督学习，迫使模型学习基因间的协同波动规律。在 90% 数据丢失的极端稀疏场景下，准确率仍可保持在 60% 以上 。 
 
- 📊 性能亮点
+## 📊 性能亮点
 在涵盖 7 种实体瘤和 3 种测序平台的系统性评估中，ChromoNet 显著优于现有主流工具（如 CopyKAT, InferCNV, SCEVAN） 。
 | 数据集              | Accuracy | AUROC | Recall |
 |---------------------|----------|-------|--------|
@@ -23,7 +23,7 @@ ChromoNet v1.0.0
 
 ---
 
- 🚀 最快上手（推荐 Docker，5 分钟出结果）
+ ## 🚀 最快上手（推荐 Docker，5 分钟出结果）
 
 ```bash
 # 1. 拉取官方镜像（已通过 GPU/CPU Pearson R ≥ 0.9 测试）
