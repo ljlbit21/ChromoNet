@@ -5,23 +5,20 @@ import os
 import sys
 from scipy.stats import pearsonr
 
-# ==================== 路径自动适配 ====================
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "."))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
 sys.path.append(BASE_DIR)
 
 from src.model import ChromoNet
 from src.preprocessor import SmartPreprocessor
 
-# 测试配置（使用小样本避免内存问题）
-TEST_CSV = os.path.join(BASE_DIR, "data", "processed", "BRCA_1.csv")
-MODEL_PATH = os.path.join(BASE_DIR, "results", "models", "best_brca_model.pth")
-GENE_POS_PATH = os.path.join(BASE_DIR, "data", "reference", "gene_pos_hg19.csv")
+TEST_CSV = os.path.join(BASE_DIR, 'data', 'processed', 'BRCA_1.csv')
+MODEL_PATH = os.path.join(BASE_DIR, 'results', 'models', 'best_brca_model.pth')
+GENE_POS_PATH = os.path.join(BASE_DIR, 'data', 'reference', 'gene_pos_hg19.csv')
 
-print("🔍 正在启动 GPU vs CPU 一致性测试 (Pearson R ≥ 0.9)...")
+print('GPU vs CPU consistency test (target: Pearson R >= 0.9)...')
 
-# 1. 加载测试数据（取前 200 行）
 if not os.path.exists(TEST_CSV):
-    print(f"❌ 测试文件不存在: {TEST_CSV}")
+    print(f'Error: test file not found: {TEST_CSV}')
     exit(1)
 df = pd.read_csv(TEST_CSV).head(200)
 preprocessor = SmartPreprocessor(GENE_POS_PATH)
